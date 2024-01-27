@@ -1,14 +1,9 @@
-import {
-  type ReactNode,
-  useMemo,
-  useCallback,
-  useState,
-  useEffect,
-  useRef,
-} from 'react';
+'use client';
+
+import { useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { setCookie, destroyCookie, parseCookies } from 'nookies';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { auth } from '@/lib/firebase/config';
 
@@ -21,7 +16,7 @@ import {
 } from '@/stores/contexts/Auth';
 
 export const AuthProvider: ReactComponent = ({ children }) => {
-  const { push } = useRouter();
+  const router = useRouter();
 
   const [user, setUser] = useState<User>({ ...defaultUser });
 
@@ -55,16 +50,16 @@ export const AuthProvider: ReactComponent = ({ children }) => {
       const { 'redirect-auth': redirectAuth = '/app' } =
         parseCookies(undefined);
 
-      await push(redirectAuth);
+      router.push(redirectAuth);
     },
-    [push],
+    [router],
   );
 
   const signOut = useCallback(async () => {
     await auth.signOut();
 
-    await push('/auth/signin');
-  }, [push]);
+    router.push('/auth/signin');
+  }, [router]);
 
   useEffect(
     () =>
